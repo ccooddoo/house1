@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
-import joblib  # For loading the trained model
+import joblib
 import plotly.express as px
-import io  # To handle in-memory files for download
+import io
 
 # Load the trained model (ensure the path is correct)
-model = joblib.load("optimized_house_price_model_xgb.pkl")  # Updated to your optimized model
+model = joblib.load("optimized_house_price_model_xgb.pkl")
 
 # Prices for materials and construction stages (adjust the multipliers for locations)
 location_prices = {
@@ -101,7 +101,7 @@ with st.sidebar.expander("Post-Construction Materials", expanded=False):
 # Button to predict total cost
 if st.button("Predict Total Cost"):
     # Prepare the feature set for the model
-    features = pd.DataFrame([[ 
+    features = pd.DataFrame([[
         sq_ft,
         location,  # Pass location directly as a categorical column
         int(bool(selected_pre_materials)),  # 1 if any pre-construction selected, else 0
@@ -109,7 +109,7 @@ if st.button("Predict Total Cost"):
         int(bool(selected_post_materials))  # 1 if any post-construction selected, else 0
     ]], columns=['SquareFootage', 'Location', 'PreConstruction', 'Construction', 'PostConstruction'])
 
-    # Predict total cost using the machine learning model
+    # Predict total cost using the fitted model
     predicted_cost = model.predict(features)[0]
 
     # Calculate the total material costs based on square footage
@@ -154,7 +154,7 @@ if st.button("Predict Total Cost"):
             hover_name='Material',
             color_discrete_sequence=px.colors.qualitative.Plotly
         )
-        
+
         # Update pie chart to show names and prices, without percentages
         fig.update_traces(textinfo='label+value')  # Show name and price
         fig.update_layout(showlegend=True)  # Show legend on the left side
@@ -166,11 +166,11 @@ if st.button("Predict Total Cost"):
     Square Footage: {sq_ft} sq ft
     BHK Type: {bhk}
     Predicted Total Cost: ₹{final_total_cost:,.2f}
-    
+
     Selected Pre-Construction Materials: {', '.join(selected_pre_materials)}
     Selected Main Construction Materials: {', '.join(selected_construction_materials)}
     Selected Post-Construction Materials: {', '.join(selected_post_materials)}
-    
+
     Detailed Cost Breakdown:
     """
     for item, cost in expenditure_data.items():
@@ -187,4 +187,3 @@ if st.button("Predict Total Cost"):
 # Footer
 st.sidebar.markdown("---")
 st.sidebar.write("© 2024 House Price Prediction")
-
