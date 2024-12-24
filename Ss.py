@@ -1,9 +1,32 @@
 import streamlit as st
 
-# Define a simple username and password (you can replace this with a more secure method in a real application)
-USER_CREDENTIALS = {"username": "password123"}  # Example: {"your_username": "your_password"}
+# Initialize session state to store user credentials if not already present
+if 'users' not in st.session_state:
+    st.session_state['users'] = {}
 
-# Login section
+# Simple signup and login system
+def signup():
+    st.sidebar.title("Sign Up")
+    
+    # User input for username and password during signup
+    new_username = st.sidebar.text_input("New Username", "")
+    new_password = st.sidebar.text_input("New Password", "", type="password")
+    confirm_password = st.sidebar.text_input("Confirm Password", "", type="password")
+    
+    if st.sidebar.button("Sign Up"):
+        if new_username and new_password and confirm_password:
+            if new_password == confirm_password:
+                if new_username in st.session_state['users']:
+                    st.sidebar.error("Username already exists! Please choose another.")
+                else:
+                    # Save the new user credentials
+                    st.session_state['users'][new_username] = new_password
+                    st.sidebar.success("Sign up successful! You can now log in.")
+            else:
+                st.sidebar.error("Passwords do not match!")
+        else:
+            st.sidebar.error("Please fill in all fields.")
+
 def login():
     st.sidebar.title("Login")
 
@@ -13,15 +36,25 @@ def login():
 
     if st.sidebar.button("Login"):
         # Check if credentials are correct
-        if username in USER_CREDENTIALS and password == USER_CREDENTIALS[username]:
+        if username in st.session_state['users'] and password == st.session_state['users'][username]:
             st.session_state["logged_in"] = True
             st.sidebar.success("Login successful!")
         else:
             st.sidebar.error("Invalid username or password!")
 
+# Sidebar for selecting the action: login or signup
+st.sidebar.title("Welcome")
+action = st.sidebar.radio("Choose an action", ("Login", "Sign Up"))
+
+# Handle Login or Sign Up
+if action == "Login":
+    login()
+elif action == "Sign Up":
+    signup()
+
 # Check if the user is logged in
 if "logged_in" not in st.session_state or not st.session_state["logged_in"]:
-    login()
+    st.warning("Please log in to access the study materials.")
 else:
     # Title of the app
     st.title("Study Notes Download Center")
