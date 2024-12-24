@@ -52,10 +52,10 @@ notes_by_year_and_semester = {
     },
     "4th Year": {
         "Semester 7": {
-            "Artificial Intelligence": "ai.pdf",
+            "Artificial Intelligence": "Ai.pdf",
             "Cloud Computing": "cc.pdf",
-            "Big Data": "bigdata.pdf",
-            "Blockchain": "blockchain.pdf"
+            "Big Data": "Bigdata.pdf",
+            "Blockchain": "Blockchain.pdf"
         },
         "Semester 8": {
             "Research Project": "research_project.pdf",
