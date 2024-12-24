@@ -4,7 +4,7 @@ import streamlit as st
 st.title("Study Notes Download Center")
 
 # Description
-st.write("Welcome to the Study Notes Download Center! Select and download the study materials you need (DBATU University).")
+st.write("Welcome to the Study Notes Download Center! Select and download the study materials you need.")
 
 # Define study notes for each year and semester
 notes_by_year_and_semester = {
