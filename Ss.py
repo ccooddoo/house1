@@ -9,7 +9,7 @@ st.write("Welcome to the Study Notes Download Center! Select and download the st
 # Pre-defined study notes (you can add more files or categories)
 study_notes = {
     "Blockchain Notes": "Blockchain.pdf",
-    "bigdata Notes": "bigdata.pdf",
+    "bigdata Notes": "Bigdata.pdf",
     "Cloud computing Notes": "cc.pdf",
     "Artificial intelligence Notes": "Ai.pdf"
 }
