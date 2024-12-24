@@ -11,7 +11,7 @@ study_notes = {
     "Mathematics Notes": "mathematics_notes.pdf",
     "Physics Notes": "physics_notes.pdf",
     "Chemistry Notes": "chemistry_notes.pdf",
-    "Biology Notes": "biology_notes.pdf"
+    "Artificial intelligence Notes": "Ai.pdf"
 }
 
 # Let user select a note to download
