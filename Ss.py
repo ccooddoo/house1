@@ -4,13 +4,13 @@ import streamlit as st
 st.title("Study Notes Download Center")
 
 # Description
-st.write("Welcome to the Study Notes Download Center! Select and download the study materials you need.")
+st.write("Welcome to the Study Notes Download Center! Select and download the study materials you need.DBATU University")
 
 # Pre-defined study notes (you can add more files or categories)
 study_notes = {
-    "Mathematics Notes": "mathematics_notes.pdf",
-    "Physics Notes": "physics_notes.pdf",
-    "Chemistry Notes": "chemistry_notes.pdf",
+    "Blockchain Notes": "Blockchain.pdf",
+    "bigdata Notes": "bigdata.pdf",
+    "Cloud computing Notes": "cc.pdf",
     "Artificial intelligence Notes": "Ai.pdf"
 }
 
@@ -22,6 +22,7 @@ if st.button("Download"):
     file_path = study_notes[selected_note]
     try:
         with open(file_path, "rb") as file:
+            
             st.download_button(
                 label="Click here to download",
                 data=file,
