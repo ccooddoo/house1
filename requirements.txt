@@ -1,7 +1,6 @@
 streamlit
-pandas
-joblib
-plotly
+openai 
+Pillow 
+moviepy 
 numpy
-xgboost
-scikit-learn
+
