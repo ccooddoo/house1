@@ -1,97 +1,66 @@
 import streamlit as st
+import openai
+from PIL import Image
+import io
+import moviepy.editor as mpy
+import numpy as np
+from io import BytesIO
 
-# Title of the app
-st.title("Study Notes Download Center")
+# Set up OpenAI API key
+openai.api_key = "your_openai_api_key"
 
-# Description
-st.write("Welcome to the Study Notes Download Center! Select and download the study materials you need.")
+st.title("AI Image to Video Editor")
+st.write("Upload an image and provide a prompt for editing the image to generate a video.")
 
-# Define study notes for each year and semester
-notes_by_year_and_semester = {
-    "1st Year": {
-        "Semester 1": {
-            "Engineering Mathematics I": "engg_math_1.pdf",
-            "Physics": "physics_1.pdf",
-            "Chemistry": "chemistry_1.pdf",
-            "Basic Electrical Engineering": "basic_electrical_1.pdf"
-        },
-        "Semester 2": {
-            "Engineering Mathematics II": "engg_math_2.pdf",
-            "Environmental Science": "env_sci.pdf",
-            "Basic Civil Engineering": "basic_civil.pdf",
-            "Programming in C": "programming_in_c.pdf"
-        }
-    },
-    "2nd Year": {
-        "Semester 3": {
-            "Data Structures": "data_structures.pdf",
-            "Database Management Systems": "dbms.pdf",
-            "Computer Networks": "computer_networks.pdf",
-            "Digital Electronics": "digital_electronics.pdf"
-        },
-        "Semester 4": {
-            "Operating Systems": "operating_systems.pdf",
-            "Theory of Computation": "toc.pdf",
-            "Software Engineering": "software_engineering.pdf",
-            "Microprocessors": "microprocessors.pdf"
-        }
-    },
-    "3rd Year": {
-        "Semester 5": {
-            "Machine Learning Basics": "ml_basics.pdf",
-            "Cyber Security Introduction": "cyber_security_intro.pdf",
-            "Internet of Things Overview": "iot_overview.pdf",
-            "Advanced Algorithms": "advanced_algorithms.pdf"
-        },
-        "Semester 6": {
-            "Machine Learning Advanced": "ml_advanced.pdf",
-            "Software Testing": "software_testing.pdf",
-            "Cyber Security Advanced": "cyber_security_advanced.pdf",
-            "IoT Applications": "iot_applications.pdf"
-        }
-    },
-    "4th Year": {
-        "Semester 7": {
-            "Artificial Intelligence": "Ai.pdf",
-            "Cloud Computing": "cc.pdf",
-            "Big Data": "Bigdata.pdf",
-            "Blockchain": "Blockchain.pdf"
-        },
-        "Semester 8": {
-            "Research Project": "research_project.pdf",
-            "Distributed Systems": "distributed_systems.pdf",
-            "Ethical Hacking": "ethical_hacking.pdf",
-            "Deep Learning": "deep_learning.pdf"
-        }
-    }
-}
+# Upload an image
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 
-# Sidebar to select the year
-st.sidebar.title("Year Selection")
-selected_year = st.sidebar.radio("Select your year", list(notes_by_year_and_semester.keys()))
+if uploaded_file is not None:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+    
+    # Get user prompt for image edit
+    prompt = st.text_area("Enter your image edit request:")
 
-# Sidebar to select the semester
-selected_semester = st.sidebar.radio(
-    "Select your semester", list(notes_by_year_and_semester[selected_year].keys())
-)
+    if st.button("Generate 15-Second Video") and prompt:
+        with st.spinner("Creating video..."):
+            # Convert image to bytes
+            img_byte_arr = io.BytesIO()
+            image.save(img_byte_arr, format='PNG')
+            img_byte_arr = img_byte_arr.getvalue()
+            
+            try:
+                # Call OpenAI API for image editing
+                response = openai.Image.create_edit(
+                    image=img_byte_arr,
+                    prompt=prompt,
+                    n=1,
+                    size="512x512"
+                )
 
-# Display notes for the selected semester
-st.header(f"{selected_year} - {selected_semester} Study Notes")
-notes_for_semester = notes_by_year_and_semester[selected_year][selected_semester]
+                # Edited image URL from OpenAI
+                edited_image_url = response['data'][0]['url']
+                st.image(edited_image_url, caption="Edited Image", use_column_width=True)
 
-# Let the user select a note to download
-selected_note = st.selectbox("Select Study Material", list(notes_for_semester.keys()))
+                # Create a video from the image with some basic animations (e.g., zoom)
+                def make_frame(t):
+                    img = np.array(image)
+                    zoom_factor = 1 + 0.05 * t  # Zoom effect over time
+                    size = (int(image.width * zoom_factor), int(image.height * zoom_factor))
+                    img_resized = image.resize(size)
+                    return np.array(img_resized)
 
-# Provide a download button for the selected note
-if st.button("Download"):
-    file_path = notes_for_semester[selected_note]
-    try:
-        with open(file_path, "rb") as file:
-            st.download_button(
-                label="Click here to download",
-                data=file,
-                file_name=file_path,
-                mime="application/pdf"
-            )
-    except FileNotFoundError:
-        st.error(f"The selected file '{file_path}' is not available. Please contact the administrator.")
+                # Create a 15-second video
+                video_clip = mpy.VideoClip(make_frame, duration=15)
+
+                # Write the video to a BytesIO object
+                video_io = BytesIO()
+                video_clip.write_videofile(video_io, codec="libx264", audio=False)
+                video_io.seek(0)
+
+                # Provide video download link
+                st.write("### Download your video")
+                st.video(video_io)
+                
+            except Exception as e:
+                st.error(f"Error: {e}")
