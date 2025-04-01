@@ -22,14 +22,14 @@ if uploaded_file is not None:
     if st.button("Generate Edited Image") and prompt:
         with st.spinner("Editing image..."):
             try:
-                response = openai.images.generate(
-                    model="dall-e-3",
+                response = openai.Image.create(
                     prompt=prompt,
                     n=1,
                     size="1024x1024"
                 )
 
-                edited_image_url = response.data[0].url
+                # Get the URL of the generated image
+                edited_image_url = response['data'][0]['url']
                 st.image(edited_image_url, caption="Edited Image", use_column_width=True)
                 st.write(f"[Download Edited Image]({edited_image_url})")
 
